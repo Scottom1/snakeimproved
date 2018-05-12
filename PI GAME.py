@@ -6,7 +6,7 @@
 # WE DO NOT OWN SNAKE!!!! JUST A SCHOOL PROJECT. 
 
 #BASE GAME IMPLEMENTED ON 4/11/2018 BY: Marcus G
-#________ UPDATED ADDED:...... BY:______
+# 5/11/2018 UPDATED ADDED: Joystick Axes and Joystick buttons  BY: Marcus G
 #________ UPDATED ADDED:...... BY:______
 #________ UPDATED ADDED:...... BY:______
 #________ UPDATED ADDED:...... BY:______
@@ -14,16 +14,29 @@
 #________ UPDATED ADDED:...... BY:______
 
 from pygame.locals import *
+from pygame.joystick import *
 from random import randint
 import pygame
 import time
 
-# holds the players position on the screen and the speed by which it moves.
-# define the actions a Player instance can do (movements):
+# window and grid dimensions
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 640
 CELL_SIZE = 32
 
+# joystick axes
+AXIS_X = 0
+AXIS_Y = 1
+
+# joystick buttons
+TOP_BLUE = 10
+BOT_BLUE = 8
+TOP_GREEN = 4
+BOT_GREEN = 6
+TOP_RED = 0
+BOT_RED = 2
+
+# image files
 APPLE_IMG = "apple.png"
 PLAYER_IMG = "snake.png"
 
@@ -152,6 +165,11 @@ class App:
         pygame.init()
         pygame.display.set_caption('SNAKE RELOADED')
 
+        # setup joystick
+        pygame.joystick.init()
+        self.joystick = Joystick(0)
+        self.joystick.init()
+
         # create main surface with window dimensions 
         self.display_surf = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.HWSURFACE)
 
@@ -162,6 +180,7 @@ class App:
         self.running = True
 
     def on_event(self, event):
+        print "Probably never called"
         if event.type == QUIT:
             self.running = False
 
@@ -212,13 +231,55 @@ class App:
         if self.on_init() == False:
             self.running = False
 
+        pygame.event.get()
+        
+##################################################################################
+
         # Main loop
         while(self.running):
-            # get input
-            pygame.event.pump()
-            keys = pygame.key.get_pressed()
+            # get joystick axis input
+            for event in pygame.event.get():
 
-            # move player
+                # Move Player (With Joystick) 
+                if event.type == JOYAXISMOTION:
+                    if event.axis == AXIS_Y:
+                        print "Axis Y {}".format(event.value)
+                        if event.value > 0:
+                            self.player.moveDown()
+                        else:
+                            self.player.moveUp()
+                    elif event.axis == AXIS_X:
+                        print "Axis X {}".format(event.value)
+                        if event.value > 0:
+                            self.player.moveRight()
+                        else:
+                            self.player.moveLeft()
+
+                # Joystick Buttons
+                if event.type == JOYBUTTONDOWN:
+                    if event.button == TOP_BLUE:
+                        print "Top blue pressed"
+                    elif event.button == BOT_BLUE:
+                        print "Bottom blue pressed"
+                    elif event.button == TOP_GREEN:
+                        print "Top green pressed"
+                    elif event.button == BOT_GREEN:
+                        print "Bottom green pressed"
+                    elif event.button == TOP_RED:
+                        print "Top red pressed"
+                    elif event.button == BOT_RED:
+                        print "Bottom red pressed"
+                    
+
+                if event.type == QUIT:
+                    self.running = False
+                
+
+            
+            keys = pygame.key.get_pressed()
+            
+            
+            # Move Player (With Keyboard)
             if(keys[K_RIGHT]):
                 self.player.moveRight()
             if(keys[K_LEFT]):
@@ -227,6 +288,7 @@ class App:
                 self.player.moveUp()
             if(keys[K_DOWN]):
                 self.player.moveDown()
+            
 
             # quit
             if(keys[K_ESCAPE]):
