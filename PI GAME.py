@@ -7,7 +7,7 @@
 
 #BASE GAME IMPLEMENTED ON 4/11/2018 BY: Marcus G
 # 5/11/2018 UPDATED ADDED: Joystick Axes and Joystick buttons  BY: Marcus G
-#________ UPDATED ADDED:...... BY:______
+#5/13/18 UPDATED ADDED: Music,power ups, increasing speed and color changes BY:James Wilson
 #________ UPDATED ADDED:...... BY:______
 #________ UPDATED ADDED:...... BY:______
 #________ UPDATED ADDED:...... BY:______
@@ -18,6 +18,13 @@ from pygame.joystick import *
 from random import randint
 import pygame
 import time
+r = 0
+g = 0
+b = 0
+x = 50
+pygame.mixer.init()
+pygame.mixer.music.load("Haunted Chase.wav")
+pygame.mixer.music.play(loops=-1)
 
 # window and grid dimensions
 WINDOW_WIDTH = 800
@@ -39,6 +46,8 @@ BOT_RED = 2
 # image files
 APPLE_IMG = "apple.png"
 PLAYER_IMG = "snake.png"
+power_IMG = "Boost.png"
+rock_IMG = "rock.png"
 
 def does_collide(x1, y1, x2, y2):
     return (x1 == x2 and y1 == y2)
@@ -60,6 +69,46 @@ class Apple:
     # draw to screen
     def draw(self, surface):
         surface.blit(self.apple_surf,(self.x, self.y))
+#power-ups
+class Power:
+
+    power_surf = None
+    
+    def __init__(self,x,y):
+        # create power up image
+        if self.power_surf is None:
+            self.power_surf = pygame.image.load(power_IMG).convert()
+            
+        # scale coords by CELL_SIZE
+        self.x = x * CELL_SIZE
+        self.y = y * CELL_SIZE
+
+    # draw to screen
+    def draw(self, surface):
+        surface.blit(self.power_surf,(self.x, self.y))
+
+
+
+# obstacle
+class rock:
+    rock_surf = None
+    
+    
+    def __init__(self,x,y):
+        # create rock image
+        if self.rock_surf is None:
+            self.rock_surf = pygame.image.load(rock_IMG).convert()
+        
+       
+            
+        # scale coords by CELL_SIZE
+        self.x = x * CELL_SIZE
+        self.y = y * CELL_SIZE
+
+    # draw to screen
+    def draw(self, surface):
+        surface.blit(self.rock_surf,(self.x, self.y))
+    
 
 # the snake
 class Player:
@@ -157,10 +206,10 @@ class App:
         self.running = False
         
         self.display_surf = None
-        
+        self.power = None
         self.player = None
         self.apple = None
-    
+        self.rock = None
     def on_init(self):
         pygame.init()
         pygame.display.set_caption('SNAKE RELOADED')
@@ -176,6 +225,8 @@ class App:
         # create game objects
         self.player = Player(3)
         self.apple = Apple(5, 5)
+        self.power = Power(6,6)
+        self.rock = rock(10,10)
 
         self.running = True
 
@@ -191,13 +242,45 @@ class App:
         # does snake eat the apple?
         for i in range(0, self.player.length):
             if does_collide(self.apple.x, self.apple.y, self.player.x[i], self.player.y[i]):
-                # reposition apple
-                self.apple.x = randint(2, 9) * CELL_SIZE
-                self.apple.y = randint(2, 9) * CELL_SIZE
-
+                #color change
+                r = randint(0, 255)
+                g = randint(0, 255)
+                b = randint(0, 255)
+                
+                #increases speed
+                if(x < 10):
+                    x = 10
+                else:
+                    x= x-(randint(0,3))
+                global r,g,b,x
                 # increase length of player
                 #self.player.length = self.player.length + 1
                 self.player.addCell()
+                # reposition apple and power up
+                self.power.x = randint(0, 24) * CELL_SIZE
+                self.power.y = randint(0, 12) * CELL_SIZE
+                self.apple.x = randint(0, 24) * CELL_SIZE
+                self.apple.y = randint(0, 12) * CELL_SIZE
+                self.rock = rock(randint(0, 24),randint(0, 12))
+                # prevents apple from spawning in other objects
+                if(does_collide(self.apple.x, self.apple.y, self.power.x, self.power.y)or does_collide(self.apple.x, self.apple.y, self.rock.x, self.rock.y)):
+                    self.apple.x = randint(0, 24) * CELL_SIZE
+                    self.apple.y = randint(0, 12) * CELL_SIZE
+                
+                    
+                if(does_collide(self.apple.x, self.apple.y, self.power.x, self.power.y)or does_collide(self.apple.x, self.apple.y, self.rock.x, self.rock.y) ):
+                    self.apple.x = randint(0, 24) * CELL_SIZE
+                    self.apple.y = randint(0, 12) * CELL_SIZE
+            if does_collide(self.rock.x, self.rock.y, self.player.x[i], self.player.y[i]):
+                    print "Your final length was {}.".format(self.player.length)
+                    self.running = False
+                          
+            if does_collide(self.power.x, self.power.y, self.player.x[i], self.player.y[i]):
+                #power up slows dowm the game
+                x = x+1
+                global x 
+                self.power.x = randint(0, 24) * CELL_SIZE
+                self.power.y = randint(0, 12) * CELL_SIZE
                 
         # does snake collide with itself? 
         for i in range(2, self.player.length):
@@ -207,20 +290,25 @@ class App:
                 #print("x[0] (" + str(self.player.x[0]) + "," + str(self.player.y[0]) + ")")
                 #print("x[" + str(i) + "] (" + str(self.player.x[i]) + "," + str(self.player.y[i]) + ")")
                 # quit
+                print "Your final length was {}.".format(self.player.length)
                 self.running = False
 
         # does snake go out of bounds?
         if self.player.x[0] >= WINDOW_WIDTH or self.player.x[0] < 0 or self.player.y[0] >= WINDOW_HEIGHT or self.player.y[0] < 0:
+            print "Your final length was {}.".format(self.player.length)
             self.running = False
 
     def on_render(self):
         # fill with black
-        self.display_surf.fill((0,0,0))
+        self.display_surf.fill((r,g,b))
 
+                   
         # draw everything
         self.player.draw(self.display_surf)
         self.apple.draw(self.display_surf)
-
+        self.power.draw(self.display_surf)
+        self.rock.draw(self.display_surf)
+        
         # update screen
         pygame.display.flip()
 
@@ -299,7 +387,7 @@ class App:
             self.on_render()
 
             # delay frames
-            time.sleep (50.0 / 1000.0)
+            time.sleep (x / 1000.0)
 
         # exit game
         self.on_cleanup()
