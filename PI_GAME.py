@@ -248,7 +248,7 @@ class App:
        
         for i in range(NUM_ROCKS):
             x = randint(0, MAX_CELL_X) * CELL_SIZE
-            y = randint(0, MAX_CELL_Y) * CELL_SIZE
+            y = randint(1, MAX_CELL_Y) * CELL_SIZE
             rock = Rock(x, y)
             print rock.x, rock.y
             self.rocks.append(rock)
