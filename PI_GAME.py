@@ -300,11 +300,7 @@ class App:
                     self.power.x = randint(0, MAX_CELL_X) * CELL_SIZE
                     self.power.y = randint(0, MAX_CELL_Y) * CELL_SIZE
                 
-                    
-                if(does_collide(self.apple.x, self.apple.y, self.power.x, self.power.y)or does_collide(self.apple.x, self.apple.y, self.rock.x, self.rock.y) ):
-                    self.apple.x = randint(0, 24) * CELL_SIZE
-                    self.apple.y = randint(0, 12) * CELL_SIZE
-                
+                   
                 
           
             for rock in self.rocks:
