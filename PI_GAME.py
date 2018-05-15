@@ -290,23 +290,21 @@ class App:
                 
                 ### COMMENTED THIS PART OUT ENTIRELY, TEMP FIX ###
 
-                """
-                try:
-                    self.rock = rock(randint(0, 24),randint(0, 12))
-                except:
-                    does_collide(self.rock.x, self.rock.y, self.player.x[i], self.player.y[i])
-                    does_collide(self.rock.x, self.rock.y, self.power.x, self.power.y)
-                    does_collide(self.rock.x, self.rock.y, self.apple.x, self.apple.y)
                 # prevents apple from spawning in other objects
-                if(does_collide(self.apple.x, self.apple.y, self.power.x, self.power.y)or does_collide(self.apple.x, self.apple.y, self.rock.x, self.rock.y)):
-                    self.apple.x = randint(0, 24) * CELL_SIZE
-                    self.apple.y = randint(0, 12) * CELL_SIZE
+                if(does_collide(self.apple.x, self.apple.y, self.power.x, self.power.y)):
+                    self.apple.x = randint(0, MAX_CELL_X) * CELL_SIZE
+                    self.apple.y = randint(0, MAX_CELL_Y) * CELL_SIZE
+                
+                    
+                if(does_collide(self.apple.x, self.apple.y, self.power.x, self.power.y)):
+                    self.power.x = randint(0, MAX_CELL_X) * CELL_SIZE
+                    self.power.y = randint(0, MAX_CELL_Y) * CELL_SIZE
                 
                     
                 if(does_collide(self.apple.x, self.apple.y, self.power.x, self.power.y)or does_collide(self.apple.x, self.apple.y, self.rock.x, self.rock.y) ):
                     self.apple.x = randint(0, 24) * CELL_SIZE
                     self.apple.y = randint(0, 12) * CELL_SIZE
-                """
+                
                 
           
             for rock in self.rocks:
@@ -321,7 +319,8 @@ class App:
                 global x 
                 self.power.x = randint(0, MAX_CELL_X) * CELL_SIZE
                 self.power.y = randint(0, MAX_CELL_Y) * CELL_SIZE
-                
+                self.apple.x = randint(0, MAX_CELL_X) * CELL_SIZE
+                self.apple.y = randint(0, MAX_CELL_Y) * CELL_SIZE
         # does snake collide with itself? 
         for i in range(2, self.player.length):
             if does_collide(self.player.x[0], self.player.y[0], self.player.x[i], self.player.y[i]):
