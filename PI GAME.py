@@ -264,7 +264,7 @@ class App:
                 try:
                     self.rock = rock(randint(0, 24),randint(0, 12))
                 except:
-                    does_collide(self.rock.x, self.rock.y, self.player.x[i], self.player.y[i]):
+                    does_collide(self.rock.x, self.rock.y, self.player.x[i], self.player.y[i])
 
                 # prevents apple from spawning in other objects
                 if(does_collide(self.apple.x, self.apple.y, self.power.x, self.power.y)or does_collide(self.apple.x, self.apple.y, self.rock.x, self.rock.y)):
